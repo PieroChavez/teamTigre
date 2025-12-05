@@ -1,41 +1,140 @@
-import React from "react";
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { createTheme } from '@mui/material/styles';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import DescriptionIcon from '@mui/icons-material/Description';
+import LayersIcon from '@mui/icons-material/Layers';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
+import { NavLink } from "react-router-dom";
+import logo from '../assets/logo.png';
 
-export default function DashboardAdm() {
+const NAVIGATION = [
+  {
+    kind: 'header',
+    title: 'MENÚ PRINCIPAL',
+  },
+  {
+    segment: 'profile',
+    title: 'Perfil',
+    icon: <AccountCircleIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Pedidos',
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Analytics',
+  },
+  {
+    segment: 'reports',
+    title: 'Reportes',
+    icon: <BarChartIcon />,
+    children: [
+      {
+        segment: 'sales',
+        title: 'Ventas',
+        icon: <DescriptionIcon />,
+      },
+      {
+        segment: 'traffic',
+        title: 'Tráfico',
+        icon: <DescriptionIcon />,
+      },
+    ],
+  },
+  {
+    segment: 'integrations',
+    title: 'Integraciones',
+    icon: <LayersIcon />,
+  },
+];
+
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: { light: true, dark: true },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
+});
+
+function DemoPageContent({ pathname }) {
   return (
-    <div className="min-h-screen bg-gray-200 flex">
-      {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-white shadow-xl p-4">
-        <h2 className="text-xl font-semibold mb-6">Panel</h2>
-        <nav className="flex flex-col gap-4">
-          <a href="#" className="text-gray-700 hover:text-black">Inicio</a>
-          <a href="#" className="text-gray-700 hover:text-black">Analytics</a>
-          <a href="#" className="text-gray-700 hover:text-black">Configuración</a>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8">
-        {/* Header inside dashboard */}
-        <header className="w-full bg-white rounded-xl p-4 shadow mb-6 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <input
-              type="text"
-              placeholder="Buscar..."
-              className="border rounded-xl px-3 py-2 w-40 md:w-60"
-            />
-            <div className="w-10 h-10 rounded-full bg-gray-300" />
-          </div>
-        </header>
-
-        {/* Grid Example */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          <div className="bg-white h-40 rounded-xl shadow p-4"></div>
-          <div className="bg-white h-40 rounded-xl shadow p-4"></div>
-          <div className="bg-white h-40 rounded-xl shadow p-4"></div>
-          <div className="bg-white h-40 rounded-xl shadow p-4"></div>
-        </section>
-      </main>
-    </div>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5">
+        Página: {pathname}
+      </Typography>
+    </Box>
   );
 }
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
+
+function Dashboard(props) {
+  const { window } = props;
+  const router = useDemoRouter('/profile');
+  const demoWindow = window ? window() : undefined;
+
+  return (
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+        branding={{
+          logo: (
+            <NavLink
+              to="/home"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+              }}
+            >
+              <img
+                src={logo}
+                alt="Logo Baristas"
+                style={{ height: 32, marginRight: 8 }}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 'bold',
+                  letterSpacing: 1,
+                }}
+              >
+                BARISTAS
+              </Typography>
+            </NavLink>
+          ),
+          title: '',
+        }}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
+  );
+}
+
+Dashboard.propTypes = {
+  window: PropTypes.func,
+};
+
+export default Dashboard;

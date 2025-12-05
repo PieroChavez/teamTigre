@@ -1,6 +1,6 @@
 import { Box, Typography, Avatar, IconButton, Stack, Paper, Grid } from "@mui/material";
 import { Instagram, Facebook, X } from "@mui/icons-material";
-import NavBar from "../Components/Navbar";
+import NavBar from "../Components/Navigations/Navbar";
 
 import portadaImg from '../assets/img/portada.jpg';
 

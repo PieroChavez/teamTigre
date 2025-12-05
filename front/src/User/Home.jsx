@@ -1,40 +1,52 @@
 import { Box, useMediaQuery } from "@mui/material";
+import MobileNavBar from "../Components/Navigations/NavbarMovile"
 
-import NavBar from "../Components/Navbar";
+const PlaceholderBox = ({ title, height = "200px" }) => (
+  <Box
+    bgcolor="#ffffff"
+    borderRadius="12px"
+    boxShadow="0 2px 6px rgba(0,0,0,0.1)"
+    p={2}
+    mb={2}
+    height={height}
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    fontSize="1.1rem"
+    fontWeight="600"
+    color="#555"
+  >
+    {title}
+  </Box>
+);
 
 const UserHome = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 
-  // (Se eliminaron estado de Auth0 y condicionamientos de carga/autenticación)
-
   return (
-    <>
-    <NavBar/>
-    
-    <Box height="100vh" display="flex" flexDirection="column">
+   <>
+   
+    {/* Replace fixed height with minHeight so the gray background grows with content */}
+    <Box minHeight="100vh" display="flex" flexDirection="column" bgcolor="#f0f0f0">
+      {/* CONTENEDOR GENERAL */}
       <Box
         flexGrow={1}
         display={isNonMobileScreens ? "flex" : "block"}
         gap="0.5rem"
         justifyContent="space-between"
-        padding={isNonMobileScreens ? "4.5rem 1%" : "4rem 0.5rem"}
+        padding={isNonMobileScreens ? "4.5rem 1%" : "5rem 0.5rem"}
       >
-        {/* Columna izquierda */}
+        {/* COLUMNA IZQUIERDA */}
         <Box
           flexBasis={isNonMobileScreens ? "22%" : "100%"}
           mb={isNonMobileScreens ? 0 : 2}
-          sx={{
-            bgcolor: "grey.100",
-            borderRadius: 2,
-            border: "1px solid",
-            borderColor: "divider",
-            p: 2,
-          }}
+          mt={isNonMobileScreens ? "0.5rem" : 0} // add slight offset only on PC
         >
-          Columna izquierda
+          <PlaceholderBox title="UserWidget" height="250px" />
+          <PlaceholderBox title="Logos" height="150px" />
         </Box>
 
-        {/* Columna central scrollable */}
+        {/* COLUMNA CENTRAL */}
         <Box
           flexBasis={isNonMobileScreens ? "56%" : "100%"}
           sx={{
@@ -43,54 +55,31 @@ const UserHome = () => {
             overflowY: isNonMobileScreens ? "auto" : "visible",
             maxHeight: isNonMobileScreens ? "calc(100vh - 5rem)" : "none",
             mx: "auto",
-            bgcolor: "grey.100",
-            borderRadius: 2,
-            border: "1px solid",
-            borderColor: "divider",
-            minHeight: "60vh",
           }}
         >
-          Contenido central
+          <PlaceholderBox title="MyPostWidget" height="150px" />
+          <PlaceholderBox title="Stories" height="120px" />
+          <PlaceholderBox title="PostsWidget (Feed)" height="800px" />
         </Box>
 
-        {/* Columna derecha */}
+        {/* COLUMNA DERECHA – solo PC */}
         {isNonMobileScreens && (
-          <Box
-            flexBasis="22%"
-            sx={{
-              bgcolor: "grey.100",
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "divider",
-              p: 2,
-            }}
-          >
-            Columna derecha
+          <Box flexBasis="22%" mt="0.5rem"> {/* add slight offset only on PC */}
+            <PlaceholderBox title="AdvertWidget" height="180px" />
+            <PlaceholderBox title="FriendListWidget" height="350px" />
           </Box>
         )}
       </Box>
 
-      {/* Navbar móvil solo en pantallas pequeñas */}
+      {/* NAVBAR MOBILE */}
       {!isNonMobileScreens && (
-        <Box
-          position="fixed"
-          bottom={0}
-          left={0}
-          right={0}
-          height="3.5rem"
-          sx={{
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          Navbar móvil
+        <Box>
+          <MobileNavBar/>
+        
         </Box>
       )}
     </Box>
-    </>
+   </>
   );
 };
 
