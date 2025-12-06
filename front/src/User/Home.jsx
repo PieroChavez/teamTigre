@@ -1,5 +1,6 @@
 import { Box, useMediaQuery } from "@mui/material";
 import MobileNavBar from "../Components/Navigations/NavbarMovile"
+import Stories from "../Layauts/Stories";
 
 const PlaceholderBox = ({ title, height = "200px" }) => (
   <Box
@@ -58,7 +59,7 @@ const UserHome = () => {
           }}
         >
           <PlaceholderBox title="MyPostWidget" height="150px" />
-          <PlaceholderBox title="Stories" height="120px" />
+          <Stories />
           <PlaceholderBox title="PostsWidget (Feed)" height="800px" />
         </Box>
 

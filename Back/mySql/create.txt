@@ -1,0 +1,123 @@
+
+/* -------------------------------------------------------
+   CREACIÓN DE BASE DE DATOS
+---------------------------------------------------------*/
+CREATE DATABASE tigre CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE tigre;
+
+/* -------------------------------------------------------
+   TABLA: users
+   Descripción:
+   - Guarda todos los usuarios registrados.
+   - Permite login tradicional (email + password)
+   - Permite login con Google (google_id)
+---------------------------------------------------------*/
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- Identificador único del usuario
+    name VARCHAR(120) NOT NULL,                -- Nombre del usuario
+    email VARCHAR(150) UNIQUE NOT NULL,        -- Email único para login
+    password VARCHAR(255) NULL,                -- Contraseña hash (NULL si usa Google)
+    google_id VARCHAR(255) NULL,               -- ID de Google para autenticación OAuth
+    avatar TEXT NULL,                          -- URL de la foto del perfil
+    role ENUM('admin','user') DEFAULT 'user',  -- Rol del sistema
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de registro
+);
+
+/* -------------------------------------------------------
+   TABLA: news
+   Descripción:
+   - Noticias publicadas por administradores o usuarios.
+   - Relación con users (author_id)
+---------------------------------------------------------*/
+CREATE TABLE news (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- ID de la noticia
+    title VARCHAR(255) NOT NULL,               -- Título
+    content TEXT NOT NULL,                     -- Contenido de la noticia
+    image TEXT NULL,                           -- Imagen opcional
+    author_id INT,                             -- Usuario que creó la noticia
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (author_id) REFERENCES users(id) -- Relación con users
+);
+
+/* -------------------------------------------------------
+   TABLA: hero_section
+   Descripción:
+   - Contenido del hero principal del sitio.
+   - Se puede actualizar para cambiar el banner.
+---------------------------------------------------------*/
+CREATE TABLE hero_section (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- ID
+    title VARCHAR(255) NOT NULL,               -- Título del hero
+    subtitle VARCHAR(255) NULL,                -- Subtítulo opcional
+    image TEXT NOT NULL,                       -- Imagen del banner
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+/* -------------------------------------------------------
+   TABLA: fighters
+   Descripción:
+   - Registra peleadores (nombre, apodo, imagen, redes)
+---------------------------------------------------------*/
+CREATE TABLE fighters (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- ID del peleador
+    name VARCHAR(150) NOT NULL,                -- Nombre real
+    nickname VARCHAR(150) NULL,                -- Apodo
+    division VARCHAR(100) NULL,                -- Categoría / peso
+    description TEXT NULL,                     -- Biografía o descripción
+    image TEXT NULL,                           -- Imagen del peleador
+    instagram VARCHAR(255) NULL,               -- Redes sociales
+    facebook VARCHAR(255) NULL,
+    youtube VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+/* -------------------------------------------------------
+   TABLA: events
+   Descripción:
+   - Eventos de peleas o competencias.
+   - Cada evento tiene fecha y título.
+---------------------------------------------------------*/
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- ID del evento
+    title VARCHAR(255) NOT NULL,               -- Título del evento
+    date DATETIME NOT NULL,                    -- Fecha del evento
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+/* -------------------------------------------------------
+   TABLA: bets
+   Descripción:
+   - Apuestas realizadas por los usuarios.
+   - Relación con: users, events y fighters.
+---------------------------------------------------------*/
+CREATE TABLE bets (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- ID de apuesta
+    user_id INT NOT NULL,                      -- Usuario que apuesta
+    event_id INT NOT NULL,                     -- Evento en el que apuesta
+    fighter_id INT NOT NULL,                   -- Peleador elegido
+    amount DECIMAL(10,2) NOT NULL,             -- Monto apostado
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id), 
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (fighter_id) REFERENCES fighters(id)
+);
+
+/* -------------------------------------------------------
+   TABLA: refresh_tokens
+   Descripción:
+   - Tokens de actualización para JWT.
+   - Mantienen al usuario logueado sin pedir credenciales.
+---------------------------------------------------------*/
+CREATE TABLE refresh_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,         -- ID interno
+    user_id INT NOT NULL,                      -- Usuario dueño del token
+    token TEXT NOT NULL,                       -- Token largo
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
+/*---------------------PRIMERAS CONSULTAS ---------------------------------------*/
