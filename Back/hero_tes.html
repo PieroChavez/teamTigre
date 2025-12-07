@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Tester Hero con Imagen Local</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        padding: 20px;
+    }
+    .card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        margin-bottom: 20px;
+    }
+    button {
+        padding: 10px 15px;
+        border: none;
+        background: black;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h1>Tester Backend — Hero Section</h1>
+
+<!-- FORMULARIO CREAR HERO -->
+<div class="card">
+    <h2>Crear Hero</h2>
+
+    <input type="text" id="title" placeholder="Título">
+    <input type="text" id="subtitle" placeholder="Subtítulo">
+    
+    <!-- Input de archivo -->
+    <input type="file" id="imageFile" accept="image/*">
+
+    <button onclick="createHero()">Crear</button>
+</div>
+
+<!-- LISTA -->
+<div class="card">
+    <h2>Lista de Hero</h2>
+
+    <button onclick="getHeroes()">Actualizar Lista</button>
+
+    <div id="heroList" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+const API_URL = "http://localhost:4000/hero";
+
+async function createHero() {
+    const title = document.getElementById("title").value;
+    const subtitle = document.getElementById("subtitle").value;
+    const file = document.getElementById("imageFile").files[0];
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("subtitle", subtitle);
+    formData.append("image", file);
+
+    const res = await fetch(API_URL, {
+        method: "POST",
+        body: formData,
+    });
+
+    alert("Hero creado ✔");
+    getHeroes();
+}
+
+async function getHeroes() {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    const container = document.getElementById("heroList");
+    container.innerHTML = "";
+
+    data.forEach(hero => {
+        container.innerHTML += `
+            <div style="background:#fff;padding:15px;border-radius:8px;margin-bottom:10px">
+                <h3>${hero.title}</h3>
+                <p>${hero.subtitle || ""}</p>
+                <img src="http://localhost:4000${hero.image}" width="200">
+
+                <br><br>
+                <button onclick="deleteHero(${hero.id})">Eliminar</button>
+            </div>
+        `;
+    });
+}
+
+async function deleteHero(id) {
+    if (!confirm("¿Eliminar este hero?")) return;
+
+    await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+    });
+
+    getHeroes();
+}
+</script>
+
+</body>
+</html>
