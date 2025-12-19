@@ -15,6 +15,9 @@
 
     {{-- 🛑 ESTA LÍNEA CARGA TUS ESTILOS PERSONALIZADOS 🛑 --}}
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+
+    <!-- Tailwind CSS CDN (Opcional, si usas Tailwind en tu proyecto) -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
 </head>
 <body>
@@ -30,6 +33,7 @@
                  style="height: 30px; margin-right: 8px;"
                  class="d-inline-block align-text-top">
             <span class="d-none d-sm-inline">Panel de Control</span>
+            
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
