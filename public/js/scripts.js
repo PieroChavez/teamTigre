@@ -7,3 +7,17 @@ window.addEventListener('scroll', function() {
         nav.classList.remove('menu-fixed');
     }
 });
+
+
+
+ const openMenu = document.getElementById('openMenu');
+    const closeMenu = document.getElementById('closeMenu');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    openMenu.addEventListener('click', () => {
+        mobileMenu.classList.remove('hidden');
+    });
+
+    closeMenu.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+    });

@@ -1,5 +1,16 @@
 @import 'tailwindcss';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .nav-link {
+        @apply text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded text-sm transition;
+    }
+}
+
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

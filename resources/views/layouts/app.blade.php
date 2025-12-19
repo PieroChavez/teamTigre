@@ -75,7 +75,7 @@
     </div>
 </nav>
 
-<div class="container mt-4">
+<div class="container mt-4">    
 
     {{-- Mensajes de Sesión (Success/Error) --}}
     @if (session('success'))
