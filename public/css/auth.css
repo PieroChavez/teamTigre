@@ -1,0 +1,110 @@
+/* public/css/auth.css */
+
+/* 1. Fondo de pantalla (Mantener la configuración base) */
+body {
+    margin: 0;
+    padding: 0;
+    /* Asegúrate de que tu fondo.png esté en public/img/fondo.png */
+    background-image: url('../img/portada.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: sans-serif;
+}
+
+/* 2. Contenedor de Partículas y Capa de Oscuridad */
+#particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* Capa más oscura para mejor contraste del formulario transparente */
+    background-color: rgba(0, 0, 0, 0.6); 
+}
+
+/* 3. Contenedor Principal (Centrado Responsivo) */
+.main-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* 4. Estilo de la Tarjeta de Login (Glassmorphism / Dinámico) */
+.login-card {
+    max-width: 400px;
+    width: 100%;
+    
+    /* EFECTO CRISTAL (Glassmorphism) */
+    background-color: rgba(255, 255, 255, 0.1); /* Transparencia de fondo */
+    backdrop-filter: blur(8px); /* Aumentar el desenfoque */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil */
+    border-radius: 15px; /* Bordes más redondeados */
+    
+    /* Sombra más suave y profunda */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
+    
+    /* Transición para efectos dinámicos */
+    transition: all 0.3s ease-in-out;
+}
+
+/* EFECTO DINÁMICO: Sombra al pasar el cursor */
+.login-card:hover {
+    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5); /* Sombra más fuerte al pasar el cursor */
+    transform: translateY(-2px); /* Eleva ligeramente la tarjeta */
+}
+
+.login-card .card-header {
+    /* Hacemos el encabezado también transparente */
+    background-color: rgba(0, 0, 0, 0.2) !important; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    color: #fff !important; /* Asegurar texto blanco */
+}
+
+.login-card .card-body {
+    color: #fff; /* Asegurar que el texto del body sea blanco o claro */
+}
+
+/* 5. Estilos de Formulario para mejor visibilidad */
+.form-label {
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.form-control {
+    /* Hacer que los inputs se vean mejor sobre el fondo claro */
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary {
+    /* Estilo de botón más sólido y atractivo */
+    background-color: #ffc107; /* Amarillo/Naranja (color del boxeo) */
+    border-color: #ffc107;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    transform: scale(1.02); /* Pequeña animación al pasar el cursor */
+}
+
+.form-check-label {
+    color: #fff;
+}
