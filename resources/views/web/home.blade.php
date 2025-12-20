@@ -173,48 +173,317 @@
     </div>
 </section>
 -->
+<section class="py-20 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4">
 
+        <!-- TÍTULO -->
+        <h2 class="text-center text-3xl font-bold mb-14">
+            NO TE PUEDES PERDER
+        </h2>
 
-<section class="eventos">
-    <div class="container">
-        <h2 class="text-center mb-4">Próximos Eventos</h2>
-        <div class="grid-eventos">
-            @foreach(App\Models\Evento::orderBy('fecha', 'asc')->take(3)->get() as $evento)
-                <div class="evento-card">
-                    <h3>{{ $evento->nombre }}</h3>
-                    <p>{{ \Illuminate\Support\Str::limit($evento->descripcion, 80) }}</p>
-                    <p class="fecha">{{ \Carbon\Carbon::parse($evento->fecha)->format('d M, Y') }}</p>
-                    <a href="{{ route('web.evento', $evento->id) }}" class="btn btn-primary">Ver Evento</a>
-                </div>
-            @endforeach
-        </div>
-    </div>
+        <!-- GRID RESPONSIVE REAL -->
+        <div
+            class="grid
+                   grid-cols-1
+                   sm:grid-cols-2
+                   lg:grid-cols-3
+                   xl:grid-cols-4
+                   gap-10
+                   justify-items-center">
+
+            @foreach(
+                App\Models\Evento::orderBy('created_at', 'desc')->get()
+                as $evento
+            )
+                <div
+                    class="w-full max-w-sm
+                           bg-white rounded-2xl shadow-md
+                           hover:shadow-xl transition
+                           overflow-hidden flex flex-col">
+
+                    <!-- IMAGEN -->
+                    <img
+                        src="{{ asset('img/portada.png') }}"
+                        alt="Evento {{ $evento->nombre }}"
+                        class="h-44 w-full object-cover">
+
+                    <!-- CONTENIDO -->
+                    <div class="p-6 flex flex-col flex-grow text-center">
+
+                        <h3 class="text-lg font-semibold mb-3">
+                            {{ $evento->nombre }}
+                        </h3>
+
+                        <p class="text-gray-600 text-sm mb-4">
+                            {{ \Illuminate\Support\Str::limit($evento->descripcion, 80) }}
+                        </p>
+
+                        <p class="text-sm text-gray-500 mb-6">
+                            📅 {{ \Carbon\Carbon::parse($evento->fecha)->format('d M, Y') }}
+                        </p>
+
+                        <!-- BOTÓN -->
+                        <a href="{{ route('web.evento', $evento->id) }}"
+                           class="mt-auto inline-block w-full
+                                  rounded-xl bg-orange-500
+                                  py-3 text-white font-semibold
+                                  hover:bg-orange-600 transition">
+                            Ver Evento
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+
+        </div>
+
+        <!-- BOTÓN GENERAL -->
+        <div class="mt-16 text-center">
+            <a href="{{ route('web.eventos') }}"
+               class="inline-block rounded-xl border-2 border-orange-500
+                      px-10 py-3 font-semibold text-orange-500
+                      hover:bg-orange-500 hover:text-white transition">
+                Ver todos los eventos
+            </a>
+        </div>
+
+    </div>
 </section>
 
-<section class="noticias bg-light">
-    <div class="container">
-        <h2 class="text-center mb-4">Últimas Noticias</h2>
-        <div class="grid-noticias">
-            @foreach(App\Models\Noticia::orderBy('created_at', 'desc')->take(3)->get() as $noticia)
-                <div class="noticia-card">
-                    <h3>{{ $noticia->titulo }}</h3>
-                    <p>{{ \Illuminate\Support\Str::limit($noticia->contenido, 80) }}</p>
-                    <p class="fecha">{{ $noticia->created_at->format('d M, Y') }}</p>
-                    <a href="{{ route('web.noticia', $noticia->id) }}" class="btn btn-secondary">Leer Más</a>
-                </div>
-            @endforeach
-        </div>
-    </div>
+
+
+
+
+
+<section class="py-20 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4">
+
+        <h2 class="text-3xl font-bold mb-10 uppercase">
+            Destacado
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+            <!-- NOTICIA DESTACADA -->
+            @php
+                $destacada = App\Models\Noticia::orderBy('created_at','desc')->first();
+            @endphp
+
+            @if($destacada)
+            <div class="lg:col-span-2 bg-white rounded-xl shadow overflow-hidden">
+                
+                <!-- IMAGEN -->
+                <img src="{{ asset('img/portada.png') }}"
+                     class="w-full h-[420px] object-cover">
+
+                <div class="p-6">
+                    <span class="text-sm text-gray-500 uppercase">
+                        Destacado
+                    </span>
+
+                    <h3 class="text-2xl font-bold mt-2 mb-4">
+                        {{ $destacada->titulo }}
+                    </h3>
+
+                    <p class="text-gray-600 mb-6">
+                        {{ \Illuminate\Support\Str::limit($destacada->contenido, 150) }}
+                    </p>
+
+                    <a href="{{ route('web.noticia', $destacada->id) }}"
+                       class="inline-block font-semibold text-orange-500 hover:underline">
+                        Leer más →
+                    </a>
+                </div>
+            </div>
+            @endif
+
+            <!-- COLUMNA INSTAGRAM -->
+            <div class="bg-white rounded-xl shadow p-4">
+                <h4 class="font-semibold mb-4">Instagram</h4>
+
+                <!-- EMBED -->
+                <iframe
+                    src="https://www.instagram.com/p/CODE_AQUI/embed"
+                    class="w-full h-[500px]"
+                    frameborder="0"
+                    scrolling="no"
+                    allowtransparency="true">
+                </iframe>
+            </div>
+
+        </div>
+    </div>
 </section>
 
-<section class="cta text-center">
-    <div class="container">
-        <h2>Únete a Nuestra Comunidad</h2>
-        <p>Inscríbete ahora y participa en nuestros cursos y eventos.</p>
-        {{-- 🛑 CORRECCIÓN 2: Cambiado de 'web.login' a 'login' --}}
-        <a href="{{ route('login') }}" class="btn btn-success btn-lg">Login / Inscripción</a>
-    </div>
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+
+        <!-- TÍTULO -->
+        <h2 class="text-3xl font-bold mb-12 uppercase">
+            Últimas Noticias
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+            <!-- GRID DE NOTICIAS -->
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-10">
+
+                @foreach(
+                    App\Models\Noticia::orderBy('created_at', 'desc')->get()
+                    as $noticia
+                )
+                <article class="bg-white shadow rounded-xl overflow-hidden group">
+
+                    <!-- IMAGEN -->
+                    <div class="overflow-hidden">
+                        <img
+                            src="{{ asset('img/portada.png') }}"
+                            alt="{{ $noticia->titulo }}"
+                            class="w-full h-56 object-cover
+                                   group-hover:scale-105 transition duration-300">
+                    </div>
+
+                    <!-- CONTENIDO -->
+                    <div class="p-6">
+                        <span class="text-xs text-gray-500 uppercase">
+                            {{ $noticia->created_at->diffForHumans() }}
+                        </span>
+
+                        <h3 class="text-lg font-bold mt-2 mb-3 leading-snug">
+                            {{ $noticia->titulo }}
+                        </h3>
+
+                        <a href="{{ route('web.noticia', $noticia->id) }}"
+                           class="font-semibold text-orange-500 hover:underline">
+                            Leer más →
+                        </a>
+                    </div>
+                </article>
+                @endforeach
+
+            </div>
+
+            <!-- COLUMNA INSTAGRAM -->
+            <aside class="bg-gray-50 rounded-xl shadow p-4 h-fit sticky top-24">
+
+                <h4 class="font-semibold mb-4">
+                    Instagram
+                </h4>
+
+                <!-- EMBED INSTAGRAM -->
+                <iframe
+                    src="https://www.instagram.com/p/CODE_AQUI/embed"
+                    class="w-full h-[520px] rounded"
+                    frameborder="0"
+                    scrolling="no"
+                    allowtransparency="true">
+                </iframe>
+
+            </aside>
+
+        </div>
+    </div>
 </section>
+
+
+<footer class="bg-black text-gray-300 pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <!-- GRID PRINCIPAL -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+
+            <!-- LOGO + DESCRIPCIÓN -->
+            <div>
+                <a href="{{ route('home') }}" class="inline-block mb-4">
+                    <img src="{{ asset('img/logo.png') }}"
+                         alt="Logo"
+                         class="h-10">
+                </a>
+
+                <p class="text-sm leading-relaxed text-gray-400">
+                    Entrenamos campeones. Comunidad dedicada al boxeo,
+                    MMA y alto rendimiento deportivo.
+                </p>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">
+                    Navegación
+                </h4>
+                <ul class="space-y-3 text-sm">
+                    <li>
+                        <a href="{{ route('home') }}" class="hover:text-orange-500 transition">
+                            Inicio
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('web.eventos') }}" class="hover:text-orange-500 transition">
+                            Eventos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('web.noticias') }}" class="hover:text-orange-500 transition">
+                            Noticias
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('login') }}" class="hover:text-orange-500 transition">
+                            Login / Registro
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- CONTACTO -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">
+                    Contacto
+                </h4>
+                <ul class="space-y-3 text-sm text-gray-400">
+                    <li>📍 Huancayo, Perú</li>
+                    <li>📧 contacto@tusitio.com</li>
+                    <li>📞 +51 999 999 999</li>
+                </ul>
+            </div>
+
+            <!-- REDES SOCIALES -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">
+                    Síguenos
+                </h4>
+
+                <div class="flex space-x-4">
+                    <a href="#"
+                       class="w-10 h-10 flex items-center justify-center
+                              rounded-full border border-gray-600
+                              hover:bg-orange-500 hover:border-orange-500 transition">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2v-3h2v-2c0-2 1.2-3 3-3h2v3h-2c-.6 0-1 .4-1 1v1h3l-.5 3h-2.5v7A10 10 0 0 0 22 12z"/>
+                        </svg>
+                    </a>
+
+                    <a href="#"
+                       class="w-10 h-10 flex items-center justify-center
+                              rounded-full border border-gray-600
+                              hover:bg-orange-500 hover:border-orange-500 transition">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm10 2c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3h10zm-5 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DIVIDER -->
+        <div class="border-t border-gray-800 mt-12 pt-6 text-center text-sm text-gray-500">
+            © {{ date('Y') }} Tu Marca. Todos los derechos reservados.
+        </div>
+
+    </div>
+</footer>
+
+
 <script>
     const textCarousel = document.getElementById('textCarousel');
     const textSlides = textCarousel.children;
