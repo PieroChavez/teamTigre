@@ -4,100 +4,151 @@
     <meta charset="UTF-8">
     <title>@yield('title', 'Admin - Escuela de Box')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Bootstrap CDN --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    {{-- Font Awesome (Necesario para los íconos) --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    {{-- 🛑 ESTA LÍNEA CARGA TUS ESTILOS PERSONALIZADOS 🛑 --}}
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-
-    <!-- Tailwind CSS CDN (Opcional, si usas Tailwind en tu proyecto) -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <!-- FontAwesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 </head>
-<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container-fluid container">
-        
-        {{-- Navbar Brand con Logo --}}
-        <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-            {{-- Asegúrate de que public/img/logo.png exista --}}
-            <img src="{{ asset('img/logo.png') }}" 
-                 alt="Logo Escuela de Box" 
-                 style="height: 30px; margin-right: 8px;"
-                 class="d-inline-block align-text-top">
-            <span class="d-none d-sm-inline">Panel de Control</span>
-            
-        </a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+<body class="bg-gray-100">
+
+<div class="flex min-h-screen">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 z-40
+               w-64 bg-indigo-600
+               transition-all duration-300
+               flex flex-col">
+
+        <!-- LOGO -->
+        <div class="flex items-center gap-3 px-6 py-4 text-white font-bold text-lg">
+            <img src="{{ asset('img/logo.png') }}" class="h-8 shrink-0">
+            <span class="sidebar-text whitespace-nowrap">Panel Admin</span>
+        </div>
+
+        <!-- MENU -->
+        <nav class="mt-6 px-3 space-y-2 flex-1">
+
+            <a href="{{ route('home') }}"
+               class="flex items-center gap-4 px-4 py-3 rounded-lg text-white hover:bg-indigo-500">
+                <i class="fas fa-home w-6 text-center"></i>
+                <span class="sidebar-text">Dashboard</span>
+            </a>
+
+            <a href="{{ route('alumnos.index') }}"
+               class="flex items-center gap-4 px-4 py-3 rounded-lg text-white hover:bg-indigo-500">
+                <i class="fas fa-users w-6 text-center"></i>
+                <span class="sidebar-text">Alumnos</span>
+            </a>
+
+            <a href="{{ route('asistencias.index') }}"
+               class="flex items-center gap-4 px-4 py-3 rounded-lg text-white hover:bg-indigo-500">
+                <i class="fas fa-calendar-check w-6 text-center"></i>
+                <span class="sidebar-text">Asistencias</span>
+            </a>
+
+            <a href="{{ route('eventos.index') }}"
+               class="flex items-center gap-4 px-4 py-3 rounded-lg text-white hover:bg-indigo-500">
+                <i class="fas fa-calendar-alt w-6 text-center"></i>
+                <span class="sidebar-text">Eventos</span>
+            </a>
+
+            <a href="{{ route('noticias.index') }}"
+               class="flex items-center gap-4 px-4 py-3 rounded-lg text-white hover:bg-indigo-500">
+                <i class="fas fa-newspaper w-6 text-center"></i>
+                <span class="sidebar-text">Noticias</span>
+            </a>
+        </nav>
+
+        <!-- BOTÓN COLAPSAR (ABAJO) -->
+        <button id="toggleSidebar"
+            class="flex items-center justify-center
+                   py-4 text-white hover:bg-indigo-500">
+            <i id="arrowIcon" class="fas fa-angle-left text-xl"></i>
         </button>
+    </aside>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            
-            {{-- Enlaces Principales del Panel --}}
-            <div class="d-flex align-items-center gap-2 ms-lg-auto">
-                
-                <div class="d-flex gap-2">
-                    <a class="btn btn-outline-light btn-sm" href="{{ route('alumnos.index') }}" title="Alumnos">
-                       <i class="fas fa-users"></i> <span class="d-none d-xl-inline">Alumnos</span>
-                    </a>
-                    <a class="btn btn-outline-light btn-sm" href="{{ route('asistencias.index') }}" title="Asistencia">
-                       <i class="fas fa-calendar-check"></i> <span class="d-none d-xl-inline">Asistencia</span>
-                    </a>
-                    <a class="btn btn-outline-light btn-sm" href="{{ route('eventos.index') }}" title="Eventos">
-                       <i class="fas fa-calendar-alt"></i> <span class="d-none d-xl-inline">Eventos</span>
-                    </a>
-                    <a class="btn btn-outline-light btn-sm" href="{{ route('noticias.index') }}" title="Noticias">
-                       <i class="fas fa-newspaper"></i> <span class="d-none d-xl-inline">Noticias</span>
-                    </a>
-                </div>
+    <!-- ============ MAIN ============ -->
+    <div id="mainContent"
+         class="flex-1 ml-64 transition-all duration-300">
 
-                {{-- Botón de LOGOUT --}}
-                @auth
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                        </button>
-                    </form>
-                @endauth
-                
-            </div>
-        </div>
+        <!-- TOP BAR -->
+        <header class="flex items-center justify-between bg-white px-6 py-4 shadow-sm">
+
+            <button id="openSidebarMobile"
+                    class="lg:hidden text-gray-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+
+            <h1 class="text-lg font-semibold text-gray-700">
+                @yield('title', 'Dashboard')
+            </h1>
+
+            @auth
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="text-red-600 hover:underline">
+                    Cerrar sesión
+                </button>
+            </form>
+            @endauth
+        </header>
+
+        <main class="p-6">
+            @yield('content')
+        </main>
     </div>
-</nav>
-
-<div class="container mt-4">    
-
-    {{-- Mensajes de Sesión (Success/Error) --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    {{-- Contenido de la Vista (Dashboard, Alumnos, etc.) --}}
-    @yield('content')
-
 </div>
 
-{{-- Script de Bootstrap (Necesario para el menú y los alerts) --}}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- OVERLAY MOBILE -->
+<div id="overlay"
+     class="fixed inset-0 bg-black/50 hidden z-30 lg:hidden"></div>
+
+<!-- SCRIPT -->
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('mainContent');
+    const toggle = document.getElementById('toggleSidebar');
+    const arrow = document.getElementById('arrowIcon');
+    const texts = document.querySelectorAll('.sidebar-text');
+
+    let collapsed = false;
+
+    toggle.addEventListener('click', () => {
+        collapsed = !collapsed;
+
+        sidebar.classList.toggle('w-64');
+        sidebar.classList.toggle('w-20');
+
+        main.classList.toggle('ml-64');
+        main.classList.toggle('ml-20');
+
+        texts.forEach(text => {
+            text.classList.toggle('hidden');
+        });
+
+        arrow.classList.toggle('fa-angle-left');
+        arrow.classList.toggle('fa-angle-right');
+    });
+
+    // MOBILE
+    const openMobile = document.getElementById('openSidebarMobile');
+    const overlay = document.getElementById('overlay');
+
+    openMobile?.addEventListener('click', () => {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    });
+</script>
+
 </body>
 </html>
