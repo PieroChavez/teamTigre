@@ -24,16 +24,80 @@
             <div class="hidden lg:flex lg:space-x-8 ml-12">
 
                 <div class="group relative">
-                    <button class="text-sm font-medium text-white hover:text-orange-500">
+                    <button
+                        class="text-sm font-medium text-white hover:text-orange-500 transition">
                         Mujeres
                     </button>
+
+                    <!-- DROPDOWN -->
+                    <div
+                        class="absolute left-0 top-full mt-3
+                               w-48 rounded-xl bg-white shadow-xl
+                               opacity-0 invisible
+                               translate-y-4
+                               group-hover:opacity-100
+                               group-hover:visible
+                               group-hover:translate-y-0
+                               transition-all duration-300">
+
+                        <ul class="py-4 text-sm text-gray-700">
+                            <li>
+                                <a href="#" class="block px-6 py-2 hover:bg-gray-100">
+                                    Ropa
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-6 py-2 hover:bg-gray-100">
+                                    Accesorios
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-6 py-2 hover:bg-gray-100">
+                                    Entrenamiento
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
+
                 <div class="group relative">
-                    <button class="text-sm font-medium text-white hover:text-orange-500">
-                        Hombres
-                    </button>
+                <button
+                    class="text-sm font-medium text-white hover:text-orange-500 transition">
+                    Hombres
+                </button>
+            
+                <!-- DROPDOWN -->
+                <div
+                    class="absolute left-0 top-full mt-3
+                           w-48 rounded-xl bg-white shadow-xl
+                           opacity-0 invisible
+                           translate-y-4
+                           group-hover:opacity-100
+                           group-hover:visible
+                           group-hover:translate-y-0
+                           transition-all duration-300">
+            
+                    <ul class="py-4 text-sm text-gray-700">
+                        <li>
+                            <a href="#" class="block px-6 py-2 hover:bg-gray-100">
+                                Guantes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block px-6 py-2 hover:bg-gray-100">
+                                Protección
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block px-6 py-2 hover:bg-gray-100">
+                                Ropa deportiva
+                            </a>
+                        </li>
+                    </ul>
                 </div>
+            </div>
+
 
             </div>
 
@@ -152,6 +216,11 @@
     closeMenu.addEventListener('click', () => {
         mobileMenu.classList.add('hidden');
     });
+
+
+
+
+    
 </script>
 
 </body>
