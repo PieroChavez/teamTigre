@@ -17,8 +17,8 @@
     <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
 
-            <button id="openMenu" class="lg:hidden p-2 text-white">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5"
+            <button id="openMenu" class="lg:hidden p-1 text-white">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5"
                      viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
@@ -29,53 +29,52 @@
 
             <!-- LOGO -->
             <a href="{{ route('web.home') }}" class="flex items-center">
-                <img src="{{ asset('img/logo.png') }}" alt="El Tigre" class="h-8 w-auto">
+                <img src="{{ asset('img/logo.png') }}" alt="El Tigre" class="h-11 w-auto">
             </a>
 
-            <!-- MENÚ DESKTOP -->
             <!-- MENÚ IZQUIERDA (SOLO PC) -->
-            <div class="hidden lg:flex lg:space-x-8">
+            <div class="hidden lg:flex lg:space-x-8 mr-auto lg:ml-12">
 
-                <!-- WOMEN -->
-                <div class="group relative">
-                    <button class="text-sm font-medium text-white hover:text-orange-500">
-                        Mujeres
-                    </button>
+    <!-- WOMEN -->
+    <div class="group relative">
+        <button class="text-sm font-medium text-white hover:text-orange-500">
+            Mujeres
+        </button>
 
-                    <div class="absolute left-0 top-full z-50 hidden w-screen max-w-md bg-white shadow-xl group-hover:block">
-                        <div class="grid grid-cols-2 gap-4 p-6">
-                            <img src="{{ asset('img/women1.jpg') }}" class="rounded-lg">
-                            <img src="{{ asset('img/women2.jpg') }}" class="rounded-lg">
-                        </div>
-                        <div class="px-6 pb-4">
-                            <a href="#" class="block py-1 text-sm text-gray-700">Ropa</a>
-                            <a href="#" class="block py-1 text-sm text-gray-700">Accesorios</a>
-                            <a href="#" class="block py-1 text-sm text-gray-700">Entrenamiento</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MEN -->
-                <div class="group relative">
-                    <button class="text-sm font-medium text-white hover:text-orange-500">
-                        Hombres
-                    </button>
-
-                    <div class="absolute left-0 top-full z-50 hidden w-screen max-w-md bg-white shadow-xl group-hover:block">
-                        <div class="grid grid-cols-2 gap-4 p-6">
-                            <img src="{{ asset('img/men1.jpg') }}" class="rounded-lg">
-                            <img src="{{ asset('img/men2.jpg') }}" class="rounded-lg">
-                        </div>
-                        <div class="px-6 pb-4">
-                            <a href="#" class="block py-1 text-sm text-gray-700">Guantes</a>
-                            <a href="#" class="block py-1 text-sm text-gray-700">Protección</a>
-                            <a href="#" class="block py-1 text-sm text-gray-700">Ropa deportiva</a>
-                        </div>
-                    </div>
-                </div>
-
-                
+        <div class="absolute left-0 top-full z-50 hidden w-screen max-w-md bg-white shadow-xl group-hover:block">
+            <div class="grid grid-cols-2 gap-4 p-6">
+                <img src="{{ asset('img/women1.jpg') }}" class="rounded-lg">
+                <img src="{{ asset('img/women2.jpg') }}" class="rounded-lg">
             </div>
+            <div class="px-6 pb-4">
+                <a href="#" class="block py-1 text-sm text-gray-700">Ropa</a>
+                <a href="#" class="block py-1 text-sm text-gray-700">Accesorios</a>
+                <a href="#" class="block py-1 text-sm text-gray-700">Entrenamiento</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEN -->
+    <div class="group relative">
+        <button class="text-sm font-medium text-white hover:text-orange-500">
+            Hombres
+        </button>
+
+        <div class="absolute left-0 top-full z-50 hidden w-screen max-w-md bg-white shadow-xl group-hover:block">
+            <div class="grid grid-cols-2 gap-4 p-6">
+                <img src="{{ asset('img/men1.jpg') }}" class="rounded-lg">
+                <img src="{{ asset('img/men2.jpg') }}" class="rounded-lg">
+            </div>
+            <div class="px-6 pb-4">
+                <a href="#" class="block py-1 text-sm text-gray-700">Guantes</a>
+                <a href="#" class="block py-1 text-sm text-gray-700">Protección</a>
+                <a href="#" class="block py-1 text-sm text-gray-700">Ropa deportiva</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 
             <!-- ICONOS DERECHA -->
             <div class="hidden lg:flex items-center space-x-6">
@@ -146,8 +145,8 @@
         </div>
     </div>
 </header>
-<!-- ESPACIO PARA NAVBAR FIJO -->
-<div class="h-16"></div>
+<!-- ESPACIO PARA NAVBAR FIJO <div class="h-16"></div> -->
+
 
 
 <main>
