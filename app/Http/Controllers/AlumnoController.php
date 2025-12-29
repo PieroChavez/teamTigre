@@ -2,92 +2,108 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Alumno;
-use App\Models\Categoria;
-
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
+use App\Models\User;
+use App\Models\Enrollment; 
+use App\Models\Attendance;
+use App\Models\Payment; 
 
 class AlumnoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function dashboard()
     {
-        $alumnos = Alumno::with('categoria')->get();
-        return view('alumnos.index', compact('alumnos'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $categorias = Categoria::all();
-        return view('alumnos.create', compact('categorias'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-            'apellido' => 'required|string|max:100',
-            'fecha_nacimiento' => 'required|date',
-            'categoria_id' => 'required|exists:categorias,id',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $rutaFoto = null;
-
-        if ($request->hasFile('foto')) {
-            $rutaFoto = $request->file('foto')->store('alumnos', 'public');
+        $alumno = Auth::user(); 
+        $profile = $alumno->studentProfile;
+        $enrollments = collect(); 
+        
+        if ($profile) {
+            $enrollments = $profile->enrollments()
+                ->where('status', 'active') 
+                ->with('category', 'plan') 
+                ->get();
         }
 
-        Alumno::create([
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'categoria_id' => $request->categoria_id,
-            'foto' => $rutaFoto,
-        ]);
-
-        return redirect()->route('alumnos.index')
-            ->with('success', 'Alumno registrado correctamente');
+        return view('dashboards.alumno', compact('alumno', 'profile', 'enrollments'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function enrollmentIndex()
     {
-        //
+        $alumno = Auth::user();
+        $profile = $alumno->studentProfile;
+
+        if (!$profile) {
+            $enrollments = collect();
+        } else {
+            $enrollments = $profile->enrollments()
+                ->with('category', 'plan')
+                ->orderByDesc('start_date')
+                ->get();
+        }
+                                                
+        return view('student.enrollments.index', compact('alumno', 'enrollments'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function attendanceHistory()
     {
-        //
+        $user = Auth::user();
+        
+        if (!$user->studentProfile) {
+            abort(404, 'Perfil de estudiante no encontrado.');
+        }
+
+        $studentProfileId = $user->studentProfile->id;
+
+        $enrollments = Enrollment::where('student_profile_id', $studentProfileId)
+            ->whereIn('status', ['active', 'finished', 'suspended']) 
+            ->with('category') 
+            ->orderByDesc('start_date')
+            ->get();
+        
+        $enrollmentIds = $enrollments->pluck('id');
+
+        $attendances = Attendance::whereIn('enrollment_id', $enrollmentIds)
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $historyByEnrollment = $attendances->groupBy('enrollment_id');
+
+        return view('student.attendance.history', compact(
+            'enrollments', 
+            'historyByEnrollment' 
+        ));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function paymentHistory()
     {
-        //
+        $user = Auth::user();
+        
+        if (!$user->studentProfile) {
+            $payments = collect();
+            return view('student.payments.history', compact('payments'));
+        }
+
+        $studentProfileId = $user->studentProfile->id;
+        
+        $enrollmentIds = Enrollment::where('student_profile_id', $studentProfileId)
+            ->pluck('id');
+
+        $payments = Payment::whereIn('enrollment_id', $enrollmentIds)
+            ->with(['enrollment.category', 'plan']) 
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('student.payments.history', compact('payments'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function index()
     {
-        //
+        $alumnos = User::with('studentProfile')
+            ->whereHas('role', function ($q) {
+                $q->where('name', 'alumno');
+            })
+            ->get();
+
+        return view('alumnos.index', compact('alumnos'));
     }
 }

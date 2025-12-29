@@ -1,99 +1,122 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AlumnoController;
-use App\Http\Controllers\AsistenciaController;
-use App\Http\Controllers\PagoController;
-use App\Http\Controllers\EventoController;
-use App\Http\Controllers\EventoAlumnoController;
-use App\Http\Controllers\NoticiaController;
-use App\Http\Controllers\WebController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
+use App\Models\Plan; 
+use App\Models\Category; 
 
-use App\Http\Controllers\Admin\UserController; 
+use App\Http\Controllers\PublicPagesController; 
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\EnrollmentController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\CoachController as AdminCoachController;
+use App\Http\Controllers\Admin\PaymentController; 
+use App\Http\Controllers\Admin\PlanController; 
 
-Route::get('/', [WebController::class, 'home'])->name('web.home');
-Route::get('/informacion', [WebController::class, 'informacion'])->name('web.informacion');
+use App\Http\Controllers\Coach\DashboardController as CoachDashboardController;
+use App\Http\Controllers\Coach\AttendanceController;
 
-Route::get('/login', function () {
-    return redirect()->route('login');
-})->name('web.login');
+use App\Http\Controllers\AlumnoController; 
+use App\Http\Controllers\StudentEnrollmentController; 
 
+Route::get('/', function () {
+    $plans = Plan::where('active', true)->get();
+    return view('welcome', compact('plans'));
+})->name('welcome');
 
+Route::get('/clases', function () {
+    $categories = Category::withCount('coaches')->get();
+    return view('clases', compact('categories'));
+})->name('clases'); 
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::view('/eventos', 'eventos')->name('eventos'); 
 
+Route::get('/planes', function () {
+    $plans = Plan::where('active', true)->get();
+    return view('planes', compact('plans')); 
+})->name('planes');
 
-Route::get('web/noticias', [NoticiaController::class, 'web'])
-    ->name('web.noticias');
-Route::get('web/noticias/{noticia}', [NoticiaController::class, 'show'])
-    ->name('web.noticia');
-Route::get('web/eventos', [EventoController::class, 'web'])
-    ->name('web.eventos');
-Route::get('web/eventos/{evento}', [EventoController::class, 'showWeb'])
-    ->name('web.evento');
-
-
-
-Route::middleware(['auth'])->group(function () {
-    
-   
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/dashboard', [HomeController::class, 'index'])->name('admin.dashboard'); 
-
-
-    Route::resource('users', UserController::class)
-        ->names('admin.users')
-        ->except(['show']); 
-
-  
-    Route::resource('alumnos', AlumnoController::class);
-
-  
-    Route::get('asistencias', [AsistenciaController::class, 'index'])
-        ->name('asistencias.index');
-    Route::post('asistencias', [AsistenciaController::class, 'store'])
-        ->name('asistencias.store');
-    Route::get('alumnos/{alumno}/asistencias',
-        [AsistenciaController::class, 'historial']
-    )->name('alumnos.asistencias');
-
-  
-    Route::get('alumnos/{alumno}/pagos', [PagoController::class, 'index'])
-        ->name('alumnos.pagos');
-    Route::post('alumnos/{alumno}/pagos', [PagoController::class, 'store'])
-        ->name('alumnos.pagos.store');
-    Route::get('pagos/{pago}/edit', [PagoController::class, 'edit'])
-        ->name('pagos.edit');
-    Route::put('pagos/{pago}', [PagoController::class, 'update'])
-        ->name('pagos.update');
-    Route::delete('pagos/{pago}', [PagoController::class, 'destroy'])
-        ->name('pagos.destroy');
- 
-    Route::get('eventos/{evento}/pagos', 
-        [PagoController::class, 'showEventPayments']
-    )->name('eventos.pagos'); 
-
-
-    Route::resource('eventos', EventoController::class)
-        ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
-    Route::get('eventos/{evento}/alumnos',
-        [EventoAlumnoController::class, 'create']
-    )->name('eventos.alumnos');
-    Route::post('eventos/{evento}/alumnos',
-        [EventoAlumnoController::class, 'store']
-    )->name('eventos.alumnos.store');
-
-    Route::get('eventos/{evento}/inscribir', [EventoController::class, 'inscribir'])
-        ->name('eventos.inscribir');
-    Route::post('eventos/{evento}/inscribir', [EventoController::class, 'guardarInscripcion'])
-        ->name('eventos.inscribir.guardar');
-
-
-    Route::resource('noticias', NoticiaController::class)
-        ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::middleware('auth')->get('/redirect', function () {
+    $user = auth()->user();
+
+    if (!$user->role) {
+        return redirect()->route('welcome'); 
+    }
+
+    return match ($user->role->name) {
+        'admin'  => redirect()->route('admin.dashboard'),
+        'coach'  => redirect()->route('coach.dashboard'),
+        'alumno' => redirect()->route('student.dashboard'), 
+        default  => abort(403),
+    };
+})->name('redirect.by.role');
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        
+        Route::resource('students', StudentController::class)->except(['destroy']);
+        Route::post('students/{student}/deactivate', [StudentController::class, 'deactivate'])
+            ->name('students.deactivate');
+            
+        Route::resource('coaches', AdminCoachController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('enrollments', EnrollmentController::class);
+        Route::resource('plans', PlanController::class)->except(['show']); 
+        Route::resource('payments', PaymentController::class);
+
+        Route::get('students/{student}/edit-photo', [StudentController::class, 'editPhoto'])
+            ->name('students.edit-photo');
+        Route::put('students/{student}/update-photo', [StudentController::class, 'updatePhoto'])
+            ->name('students.update-photo');
+
+        Route::patch('enrollments/{enrollment}/suspend', [EnrollmentController::class, 'suspend'])->name('enrollments.suspend');
+        Route::patch('enrollments/{enrollment}/reactivate', [EnrollmentController::class, 'reactivate'])->name('enrollments.reactivate');
+        Route::get('enrollments/{enrollment}/renew', [EnrollmentController::class, 'renew'])->name('enrollments.renew');
+
+        Route::get('categories/{category}/coaches', [CategoryController::class, 'editCoaches'])->name('categories.coaches.edit');
+        Route::put('categories/{category}/coaches', [CategoryController::class, 'updateCoaches'])->name('categories.coaches.update');
+    });
+
+Route::middleware(['auth', 'role:coach'])
+    ->prefix('coach')
+    ->name('coach.')
+    ->group(function () {
+        Route::get('/dashboard', [CoachDashboardController::class, 'index'])->name('dashboard');
+        
+        Route::get('categories/{category}/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('categories/{category}/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+
+        Route::get('categories/{category}/attendance/history', [AttendanceController::class, 'history'])
+            ->name('attendance.history');
+    });
+
+Route::middleware(['auth', 'role:alumno'])
+    ->prefix('alumno') 
+    ->name('student.') 
+    ->group(function () {
+        
+        Route::get('/dashboard', [AlumnoController::class, 'dashboard'])
+            ->name('dashboard');
+
+        Route::get('/mis-inscripciones', [StudentEnrollmentController::class, 'index'])
+            ->name('enrollments.index');
+
+        Route::get('/mis-asistencias', [AlumnoController::class, 'attendanceHistory'])
+             ->name('attendance.history');
+
+        Route::get('/mis-pagos', [AlumnoController::class, 'paymentHistory'])
+            ->name('payments.history');
+    });
+
+require __DIR__.'/auth.php';
