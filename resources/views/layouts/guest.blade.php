@@ -1,108 +1,167 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Escuela de Box El Tigre') }}</title>
+    <title>@yield('title', config('app.name', 'Academia Box'))</title>
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> {{-- Aseguramos Font Awesome --}}
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,600,700,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-        {{-- Asegúrate de que Alpine.js esté incluido aquí por el @vite --}}
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    
-    {{-- AÑADIMOS ALPINE.JS y el estado de la barra lateral --}}
-    <body class="font-sans text-gray-900 antialiased bg-gray-100" x-data="{ sidebarOpen: false }">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-nav {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(249, 115, 22, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased bg-white text-slate-900">
+
+    {{-- ================= NAVBAR MEJORADO ================= --}}
+    <nav x-data="{ open: false, atTop: true }" 
+         @scroll.window="atTop = (window.pageYOffset > 10 ? false : true)"
+         :class="{ 'glass-nav py-3 shadow-2xl': !atTop, 'bg-black py-5': atTop }"
+         class="fixed w-full z-50 transition-all duration-300 px-6 lg:px-12 flex justify-between items-center">
         
-        <div class="flex min-h-screen">
+        {{-- LOGO Y NOMBRE JUNTOS --}}
+        <a href="/" class="flex items-center gap-4 group">
+            <div class="relative">
+                <div class="absolute -inset-1 bg-orange-600 rounded-full opacity-20 group-hover:opacity-50 blur transition"></div>
+                <img src="{{ asset('images/logo.png') }}" 
+                     alt="Logo Academia Box" 
+                     class="relative w-12 h-12 object-contain transform group-hover:scale-110 transition-transform duration-300">
+            </div>
+            <div class="flex flex-col">
+                <span class="font-black text-2xl tracking-tighter text-white uppercase leading-none">
+                    Academia<span class="text-orange-600 italic">Box</span>
+                </span>
+                <span class="text-[8px] font-bold text-orange-500 uppercase tracking-[0.3em] leading-none mt-1">
+                    El Tigre
+                </span>
+            </div>
+        </a>
 
-            {{-- 🎯 COLUMNA 1: MENÚ LATERAL OCULTO/EXPANDIBLE (SIDEBAR) --}}
-            <aside 
-                class="bg-gray-800 text-white flex flex-col shadow-xl fixed h-full z-30 transition-all duration-300 ease-in-out" 
-                :class="sidebarOpen ? 'w-64' : 'w-20'"
-                x-on:mouseenter="sidebarOpen = true"
-                x-on:mouseleave="sidebarOpen = false"
-            >
-                
-                {{-- Logo/Título --}}
-                <div class="shrink-0 flex items-center p-6 border-b border-gray-700 h-20">
-                    <a href="/" class="flex items-center w-full">
-                        {{-- 🌟 Icono del logo Naranja --}}
-                        <x-application-logo class="w-8 h-8 fill-current text-orange-400" /> 
-                        {{-- El texto solo se muestra si la barra está abierta --}}
-                        <span 
-                            class="ml-3 font-bold text-xl transition-opacity duration-300 ease-in-out"
-                            :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-                            x-cloak>
-                            {{ config('app.name', 'Escuela de Box El Tigre') }}
-                        </span> 
-                    </a>
-                </div>
-                
-                {{-- ENLACES DE NAVEGACIÓN PÚBLICA --}}
-                <nav class="flex-1 p-4 space-y-2">
-                    
-                    @php
-                        // Función para determinar si el enlace está activo
-                        // 🌟 CLASE ACTIVA Naranja: bg-orange-600
-                        $isActive = fn($route) => request()->routeIs($route) ? 'bg-orange-600 text-white' : 'text-gray-300 hover:bg-gray-700';
-                    @endphp
-
-                    {{-- Enlaces de Navegación --}}
-                    @include('layouts.partials.sidebar-link', ['route' => 'welcome', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'label' => 'Inicio', 'isActive' => $isActive('welcome')])
-                    
-                    {{-- 🔄 CAMBIO: 'Clases' a 'Categorías' --}}
-                    @include('layouts.partials.sidebar-link', ['route' => 'clases', 'icon' => 'M11 20H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2v6m-7 8l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3v-4m-4 0h18', 'label' => 'Categorías', 'isActive' => $isActive('clases')])
-
-                    {{-- ➕ NUEVO BOTÓN: EVENTOS --}}
-                    @include('layouts.partials.sidebar-link', ['route' => 'eventos', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 'label' => 'Eventos', 'isActive' => $isActive('eventos')])
-                    
-                    @include('layouts.partials.sidebar-link', ['route' => 'planes', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.35 2.76 1A2.96 2.96 0 0012 8zm0 0v-4m0 8v4m0 0a9 9 0 100-18 9 9 0 000 18z', 'label' => 'Precios & Planes', 'isActive' => $isActive('planes')])
-                    
-                    <hr class="border-gray-700 my-4">
-
-                    {{-- 🌟 Botón de Acceso Clientes Naranja --}}
-                    @include('layouts.partials.sidebar-link', ['route' => 'login', 'icon' => 'M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3v-4m-4 0h18', 'label' => 'Acceso Clientes', 'color' => 'bg-orange-600 hover:bg-orange-700'])
-                </nav>
-            </aside>
+        {{-- Desktop Menu --}}
+        <div class="hidden md:flex items-center space-x-8">
+            <a href="{{ route('home') }}" 
+               class="text-[10px] font-black uppercase tracking-[0.2em] {{ request()->routeIs('home') ? 'text-orange-500' : 'text-gray-400' }} hover:text-orange-500 transition-colors">
+                Inicio
+            </a>
             
-            {{-- 🎯 COLUMNA 2: CONTENIDO PRINCIPAL (BODY) --}}
-            <main 
-                class="flex-1 p-0 transition-all duration-300 ease-in-out" 
-                :class="sidebarOpen ? 'ml-64' : 'ml-20'">
-                
-                {{-- Contenido de la Página (Slot: Aquí es donde se inyecta welcome.blade.php, etc.) --}}
-                {{ $slot }}
-                
-                {{-- ************************************************* --}}
-                {{-- 6. CALL TO ACTION FINAL --}}
-                {{-- ************************************************* --}}
-                <div class="bg-orange-700"> {{-- 🌟 Fondo Naranja --}}
-                    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
-                        <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                            <span class="block">¡No esperes más!</span>
-                            {{-- 🌟 Subtítulo Blanco/Naranja claro --}}
-                            <span class="block text-orange-200">Empieza tu entrenamiento hoy mismo.</span>
-                        </h2>
-                        <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-                            <div class="inline-flex rounded-md shadow">
-                                {{-- Botón final Blanco --}}
-                                <a href="/register" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-orange-600 bg-white hover:bg-orange-50 transition-colors">
-                                    Inscribirme Ahora
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <a href="{{ route('tienda.index') }}" 
+               class="text-[10px] font-black uppercase tracking-[0.2em] {{ request()->routeIs('tienda.index*') ? 'text-orange-500' : 'text-gray-400' }} hover:text-orange-500 transition-colors">
+                Tienda
+            </a>
 
-            </main>
+            <a href="#" class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-orange-500 transition-colors">Eventos</a>
+            
+            <div class="h-4 w-[1px] bg-white/10"></div>
+
+            @if (Route::has('login'))
+                @auth
+                    <a href="{{ route('dashboard') }}" 
+                       class="bg-orange-600 hover:bg-white text-black px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all duration-300 shadow-lg shadow-orange-600/20">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="text-[10px] font-black uppercase tracking-[0.2em] text-white hover:text-orange-500 transition-colors">Login</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" 
+                           class="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-black px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all duration-300">
+                            Únete
+                        </a>
+                    @endif
+                @endauth
+            @endif
         </div>
 
-        
-        
-    </body>
+        {{-- Mobile Toggle --}}
+        <button @click="open = !open" class="md:hidden text-orange-600 text-2xl">
+            <i :class="open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars-staggered'"></i>
+        </button>
+
+        {{-- Mobile Menu --}}
+        <div x-show="open" x-cloak 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="absolute top-full left-0 w-full bg-black border-t border-orange-600/30 p-8 flex flex-col space-y-6 md:hidden shadow-2xl">
+            <a href="/" class="text-white font-black uppercase tracking-widest text-sm hover:text-orange-600">Inicio</a>
+            <a href="{{ route('tienda.index') }}" class="text-white font-black uppercase tracking-widest text-sm hover:text-orange-600">Tienda</a>
+            <a href="#" class="text-white font-black uppercase tracking-widest text-sm hover:text-orange-600">Eventos</a>
+            <hr class="border-gray-800">
+            @auth
+                <a href="{{ route('dashboard') }}" class="text-orange-600 font-black uppercase tracking-widest text-sm">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}" class="text-white font-black uppercase tracking-widest text-sm">Login</a>
+                <a href="{{ route('register') }}" class="text-orange-600 font-black uppercase tracking-widest text-sm">Registro</a>
+            @endauth
+        </div>
+    </nav>
+    
+    {{-- ================= CONTENIDO ================= --}}
+    <main class="min-h-screen">
+        {{-- Quitamos el BG-BLACK fijo para que el welcome fluya mejor --}}
+        @yield('content')
+    </main>
+
+    {{-- ================= FOOTER ================= --}}
+    <footer class="bg-[#050505] border-t border-white/5 text-white pt-20 pb-10 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+            <div class="md:col-span-2 space-y-6">
+                <span class="font-black text-3xl tracking-tighter uppercase leading-none text-white">
+                    Academia<span class="text-orange-600">Box</span>
+                </span>
+                <p class="text-gray-500 text-sm leading-relaxed max-w-sm italic font-medium">
+                    "No es solo boxeo, es disciplina. Entrenamos con los estándares más altos para convertirte en tu mejor versión."
+                </p>
+                <div class="flex gap-4 pt-4">
+                    <a href="#" class="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center rounded-lg hover:bg-orange-600 hover:text-black transition-all">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center rounded-lg hover:bg-orange-600 hover:text-black transition-all">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center rounded-lg hover:bg-orange-600 hover:text-black transition-all">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-black uppercase tracking-[0.2em] text-[10px] text-orange-600 mb-8">Explorar</h4>
+                <ul class="space-y-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <li><a href="#" class="hover:text-white transition">Nuestras Sedes</a></li>
+                    <li><a href="#" class="hover:text-white transition">Planes</a></li>
+                    <li><a href="{{ route('tienda.index') }}" class="hover:text-white transition text-orange-600">Tienda Oficial</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-black uppercase tracking-[0.2em] text-[10px] text-orange-600 mb-8">Soporte</h4>
+                <ul class="space-y-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <li><a href="#" class="hover:text-white transition">Contacto</a></li>
+                    <li><a href="#" class="hover:text-white transition">Privacidad</a></li>
+                    <li><a href="#" class="hover:text-white transition">Términos</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-[9px] text-gray-600 uppercase tracking-[0.5em] font-black">
+                © {{ date('Y') }} Academia Box — Power by Laravel 12.
+            </p>
+        </div>
+    </footer>
+
+</body>
 </html>

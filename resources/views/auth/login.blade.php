@@ -1,138 +1,122 @@
-{{-- resources/views/auth/login.blade.php --}}
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <title>{{ config('app.name', 'Escuela de Box El Tigre') }}</title>
+@extends('layouts.guest')
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title', 'Acceso Combatientes')
 
-    {{-- Favicon --}}
-    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+@section('content')
+<div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#050505]">
 
-    {{-- Tailwind / Vite --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- FONDO CON PARALLAX --}}
+    <div class="absolute inset-0 bg-cover bg-center scale-110 motion-safe:animate-[pulse_10s_ease-in-out_infinite]"
+        style="background-image: url('{{ asset('images/portada.png') }}'); filter: grayscale(50%) contrast(110%);">
+    </div>
 
-    {{-- Particles.js --}}
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-</head>
+    {{-- OVERLAY --}}
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/90 to-black"></div>
 
-<body class="min-h-screen bg-black text-white overflow-hidden">
+    {{-- PARTICULAS (Z-INDEX 1) --}}
+    <div id="particles-js" class="absolute inset-0 z-[1] pointer-events-none"></div>
 
-    {{-- Fondo de partículas --}}
-    <div id="particles-js" class="fixed inset-0 z-0"></div>
-
-    {{-- Contenedor principal --}}
-    <div class="relative z-10 min-h-screen flex items-center justify-center px-4">
-
-        {{-- Caja Login (Glassmorphism) --}}
-        <div class="w-full max-w-md
-                    bg-white/8
-                    backdrop-blur-2xl
-                    p-8
-                    rounded-2xl
-                    shadow-2xl
-                    border border-white/20
-                    ring-1 ring-orange-500/20">
-
-            {{-- Logo --}}
-            <div class="flex justify-center mb-6">
-                <img src="{{ asset('favicon.png') }}" alt="Logo" class="w-20 drop-shadow-lg">
+    {{-- LOGIN CARD (COMPACTA) --}}
+    <div class="relative z-10 w-full max-w-sm mx-4">
+        <div class="absolute inset-0 bg-white/[0.02] backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl"></div>
+        
+        <div class="relative p-8 flex flex-col items-center">
+            
+            {{-- LOGO BOX (REDUCIDO) --}}
+            <div class="relative mb-6">
+                <div class="logo-box w-20 h-20 rounded-2xl border-2 border-orange-500 bg-black/80 p-2 shadow-[0_0_20px_rgba(249,115,22,0.4)] flex items-center justify-center">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
+                </div>
             </div>
 
-            {{-- Título --}}
-            <h1 class="text-2xl font-bold text-center text-orange-500 mb-6">
-                Acceso Clientes
-            </h1>
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-black text-white tracking-tighter uppercase leading-none">
+                    EL TIGRE <span class="text-orange-500">BOX</span>
+                </h1>
+                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">Gimnasio & Escuela</p>
+            </div>
 
-            {{-- Estado sesión --}}
-            <x-auth-session-status class="mb-4 text-orange-400" :status="session('status')" />
-
-            {{-- Formulario --}}
-            <form method="POST" action="{{ route('login') }}" class="space-y-4">
+            {{-- FORMULARIO (MÁS COMPACTO) --}}
+            <form method="POST" action="{{ route('login') }}" class="w-full space-y-4">
                 @csrf
 
-                {{-- Email --}}
-                <div>
-                    <label class="block text-sm mb-1 text-gray-300">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        required
-                        autofocus
-                        class="w-full rounded-lg bg-black/40 border border-gray-600
-                               text-white px-4 py-2
-                               focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <x-input-error :messages="$errors->get('email')" class="mt-1" />
-                </div>
-
-                {{-- Password --}}
-                <div>
-                    <label class="block text-sm mb-1 text-gray-300">Contraseña</label>
-                    <input
-                        type="password"
-                        name="password"
-                        required
-                        class="w-full rounded-lg bg-black/40 border border-gray-600
-                               text-white px-4 py-2
-                               focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <x-input-error :messages="$errors->get('password')" class="mt-1" />
-                </div>
-
-                {{-- Remember --}}
-                <div class="flex items-center">
-                    <input
-                        type="checkbox"
-                        name="remember"
-                        class="rounded bg-black/40 border-gray-600 text-orange-500 focus:ring-orange-500">
-                    <span class="ml-2 text-sm text-gray-400">Recordarme</span>
-                </div>
-
-                {{-- Botón --}}
-                <button
-                    type="submit"
-                    class="w-full bg-orange-600 hover:bg-orange-700
-                           transition font-semibold py-2 rounded-lg
-                           shadow-lg shadow-orange-500/30">
-                    Ingresar
-                </button>
-
-                {{-- Olvidé contraseña --}}
-                @if (Route::has('password.request'))
-                    <div class="text-center mt-4">
-                        <a href="{{ route('password.request') }}"
-                           class="text-sm text-gray-400 hover:text-orange-400 transition">
-                            ¿Olvidaste tu contraseña?
-                        </a>
+                <div class="space-y-1">
+                    <div class="relative group">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs group-focus-within:text-orange-500 transition-colors"></i>
+                        <input type="email" name="email" placeholder="Correo Electrónico" required autofocus
+                            class="w-full bg-black/40 border border-white/10 focus:border-orange-500 focus:ring-0 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 transition-all font-medium">
                     </div>
-                @endif
+                </div>
+
+                <div class="space-y-1">
+                    <div class="relative group">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs group-focus-within:text-orange-500 transition-colors"></i>
+                        <input type="password" name="password" placeholder="Contraseña" required
+                            class="w-full bg-black/40 border border-white/10 focus:border-orange-500 focus:ring-0 rounded-xl pl-10 pr-4 py-3 text-sm text-white transition-all font-medium">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between px-1">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" name="remember" class="w-3.5 h-3.5 rounded border-white/10 bg-white/5 text-orange-500 focus:ring-0">
+                        <span class="ml-2 text-[10px] font-bold text-gray-500 group-hover:text-gray-300 uppercase tracking-widest transition-colors">Recordarme</span>
+                    </label>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <button type="submit"
+                        class="w-full bg-orange-600 hover:bg-orange-500 text-white py-3 rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-orange-900/40 transform active:scale-95">
+                        ENTRAR AL RING
+                    </button>
+                    
+                    <a href="{{ route('register') }}"
+                        class="block w-full text-center py-3 rounded-xl border border-white/5 text-white/40 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-[9px] transition-all">
+                        SOLICITAR ACCESO
+                    </a>
+                </div>
             </form>
         </div>
     </div>
+</div>
 
-    {{-- Configuración de partículas --}}
-    <script>
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 80 },
-                color: { value: ["#ffffff", "#f97316"] },
-                shape: { type: "circle" },
-                opacity: { value: 0.6 },
-                size: { value: 3 },
-                move: { enable: true, speed: 1.3 },
-                line_linked: {
-                    enable: true,
-                    distance: 140,
-                    color: "#f97316",
-                    opacity: 0.3,
-                    width: 1
-                }
-            },
-            retina_detect: true
-        });
-    </script>
+{{-- PARTICULAS INTENSIFICADAS --}}
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+particlesJS("particles-js", {
+    particles: {
+        number: { value: 100, density: { enable: true, value_area: 800 } },
+        color: { value: "#f97316" }, // Naranja vibrante
+        shape: { type: "circle" },
+        opacity: { value: 0.6, random: true }, // Más opacidad para que se vean
+        size: { value: 2.5, random: true },
+        line_linked: { enable: false }, // Quitamos líneas para un look más limpio de "chispas"
+        move: { enable: true, speed: 2.5, direction: "top", random: true, out_mode: "out" } // Movimiento hacia arriba como chispas
+    }
+});
+</script>
 
-</body>
-</html>
+<style>
+.logo-box {
+    animation: floating 4s ease-in-out infinite;
+}
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+/* Estilizar el checkbox para que combine con el dark mode */
+input[type="checkbox"] {
+    appearance: none;
+    background-color: rgba(255,255,255,0.05);
+    margin: 0;
+    font: inherit;
+    color: #f97316;
+    width: 1.15em;
+    height: 1.15em;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 0.15em;
+    transform: translateY(-0.075em);
+    display: grid;
+    place-content: center;
+}
+</style>
+@endsection

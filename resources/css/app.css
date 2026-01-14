@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@media print {
+    /* Oculta la navegación y el header principal */
+    body > nav, .print\:hidden, header {
+        display: none !important;
+    }
+    /* Asegura que el contenido sea el área visible */
+    #receipt-print-area {
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+}

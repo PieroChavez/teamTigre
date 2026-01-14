@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Mostrar vista de login
      */
     public function create(): View
     {
@@ -20,27 +20,48 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Procesar autenticación y redirigir según ROL REAL
      */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        return redirect()->intended('/redirect');
+        $user = Auth::user();
 
+        // 🔐 REDIRECCIÓN SEGÚN ROLES DE TU BD
+        if ($user->hasRole('Admin')) {
+            return redirect()->route('dashboard');
+        }
+
+        if ($user->hasRole('Alumno')) {
+            return redirect()->route('alumnos.perfil', $user->id);
+        }
+
+        if ($user->hasRole('Ventas')) {
+            return redirect()->route('ventas.index');
+        }
+
+        if ($user->hasRole('Estudiante')) {
+            return redirect()->route('home');
+        }
+
+        if ($user->hasRole('cliente')) {
+            return redirect()->route('home');
+        }
+
+        // 🔁 Fallback seguro
+        return redirect()->route('home');
     }
 
     /**
-     * Destroy an authenticated session.
+     * Cerrar sesión
      */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');
