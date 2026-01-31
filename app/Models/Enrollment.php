@@ -3,61 +3,50 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\StudentProfile;
-use App\Models\Category;
-use App\Models\Plan;
-use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Enrollment extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'student_profile_id',
+        'student_id',
         'category_id',
-        'plan_id',
-        'start_date',
-        'end_date',
+        'starts_on',
+        'ends_on',
         'status',
+
+        // ✅ Billing / crédito
+        'billing_day',
+        'plan_total_cents',
+        'installments_count',
     ];
 
-    // 🧑 PERFIL DEL ALUMNO
-    public function studentProfile()
+    protected $casts = [
+        'starts_on' => 'date',
+        'ends_on' => 'date',
+
+        // ✅ Billing / crédito
+        'billing_day' => 'integer',
+        'plan_total_cents' => 'integer',
+        'installments_count' => 'integer',
+    ];
+
+    public function student(): BelongsTo
     {
-        return $this->belongsTo(StudentProfile::class);
+        return $this->belongsTo(Student::class);
     }
 
-    // 👤 USUARIO DEL ALUMNO (ACCESO DIRECTO)
-    public function student()
-    {
-        return $this->hasOneThrough(
-            User::class,
-            StudentProfile::class,
-            'id',               // StudentProfile.id
-            'id',               // User.id
-            'student_profile_id',
-            'user_id'
-        );
-    }
-
-    // 📚 CATEGORÍA
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    // 📦 PLAN
-    public function plan()
+    // ✅ Cuotas/pensiones generadas para esta matrícula
+    public function charges(): HasMany
     {
-        return $this->belongsTo(Plan::class);
-    }
-
-    // Asistencias del alumno en esta categoría
-    public function attendances()
-    {
-        return $this->hasMany(Attendance::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(Charge::class);
     }
 }

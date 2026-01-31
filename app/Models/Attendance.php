@@ -3,20 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Enrollment;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Attendance extends Model
 {
     protected $fillable = [
-        'enrollment_id',
+        'user_id',
         'date',
-        'status',
-        'notes',
+        'check_in_time',
+        'check_out_time',
+        'marked_by',
+        'source',
     ];
 
-    // Relación: una asistencia pertenece a una inscripción
-    public function enrollment()
+    protected $casts = [
+    'date' => 'date:Y-m-d',
+    ];
+
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Enrollment::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function marker(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'marked_by');
     }
 }

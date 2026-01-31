@@ -1,8 +1,8 @@
 <?php
+// database/seeders/RoleSeeder.php
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Role;
 
@@ -11,15 +11,14 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            'admin',
-            'ventas',
-            'docente',
-            'alumno',
-            'cliente',
+            ['key' => 'admin', 'name' => 'Administrador'],
+            ['key' => 'cashier', 'name' => 'Caja/Recepción'],
+            ['key' => 'trainer', 'name' => 'Entrenador'],
+            ['key' => 'student', 'name' => 'Alumno'],
         ];
 
         foreach ($roles as $role) {
-            Role::firstOrCreate(['nombre' => $role]);
+            Role::updateOrCreate(['key' => $role['key']], $role);
         }
     }
 }

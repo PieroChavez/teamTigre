@@ -4,25 +4,28 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string $roles)
     {
-        $user = Auth::user();
+        $user = $request->user();
 
-        if (!$user) {
-            abort(403);
+        if (! $user) {
+            return response()->json(['message' => 'No autenticado.'], 401);
         }
 
-        foreach ($roles as $role) {
-            if ($user->hasRole($role)) {
-                return $next($request);
-            }
+        // role:admin|attendance_controller  (o role:admin,attendance_controller)
+        $allowed = preg_split('/[|,]/', $roles) ?: [];
+        $allowed = array_values(array_filter(array_map('trim', $allowed)));
+
+        // Asegúrate que tu User tenga relación roles()
+        $hasRole = $user->roles()->whereIn('key', $allowed)->exists();
+
+        if (! $hasRole) {
+            return response()->json(['message' => 'No autorizado.'], 403);
         }
 
-        abort(403, 'No tienes permisos para acceder a esta sección.');
+        return $next($request);
     }
 }

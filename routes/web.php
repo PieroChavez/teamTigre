@@ -1,153 +1,82 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{
-    ProfileController,
-    DashboardController,
-    AlumnoController,
-    DocenteController,
-    CategoriaController,
-    PlantillaPeriodoController,
-    HorarioController,
-    InscripcionController,
-    AsistenciaController,
-    CuentaInscripcionController,
-    CuotaPagoController,
-    TipoPagoController,
-    PagoController,
-    VentaController,
-    DetalleVentaController,
-    CategoriaProductoController,
-    ProductoController, 
-    NoticiaController,
-    EventoController,
-    PeleadorController,
-    BoletoController,
-};
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\EnrollmentController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProductCategoryController;
+use App\Http\Controllers\Api\StoreOrderController;
+use App\Http\Controllers\Api\AttendanceController;
 
-use App\Http\Controllers\Tienda\PublicProductoController as PublicController;
-use App\Http\Controllers\Tienda\CarritoController;
-use App\Http\Controllers\Tienda\PedidoController;
+Route::prefix('api')->middleware(['api'])->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| 🌐 WEB PÚBLICA
-|--------------------------------------------------------------------------
-*/
-Route::get('/', function () {
-    return view('public.home');
-})->name('home');
+    // ✅ Manejo de CORS Preflight
+    Route::options('/{any}', fn () => response()->noContent(204))->where('any', '.*');
 
-// --- 🛒 TIENDA PÚBLICA ---
-Route::get('/tienda', [PublicController::class, 'index'])->name('tienda.index');
-Route::get('/tienda/producto/{producto}', [PublicController::class, 'show'])->name('tienda.show');
+    // Health Check
+    Route::get('/health', fn () => response()->json(['status' => 'ok', 'server' => 'Laravel 12']));
 
-// --- 🛍️ CARRITO ---
-Route::controller(CarritoController::class)->group(function () {
-    Route::get('/carrito', 'index')->name('carrito.index');
-    Route::post('/carrito/agregar/{id}', 'agregar')->name('carrito.agregar');
-    Route::delete('/carrito/eliminar/{id}', 'eliminar')->name('carrito.eliminar');
-});
+    // ================= TIENDA PÚBLICA =================
+    Route::get('/product-categories', [ProductCategoryController::class, 'index']);
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{slug}', [ProductController::class, 'show']);
+    Route::post('/store/orders', [StoreOrderController::class, 'storePublic']);
 
-// --- 📦 CHECKOUT / PEDIDOS ---
-Route::controller(PedidoController::class)->group(function () {
-    Route::get('/finalizar-compra', 'checkout')->name('tienda.checkout');
-    Route::post('/confirmar-pedido', 'confirmar')->name('tienda.confirmar');
-});
+    // ================= AUTH PÚBLICO =================
+    Route::post('/auth/login', [AuthController::class, 'login']);
 
-/*
-|--------------------------------------------------------------------------
-| 🔐 RUTAS PROTEGIDAS (Requieren Login)
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
+    // ================= PROTEGIDO (Sanctum) =================
+    Route::middleware('auth:sanctum')->group(function () {
 
-    // 🔴 PERFIL DE USUARIO
-    Route::controller(ProfileController::class)->group(function () {
-        Route::get('/profile', 'edit')->name('profile.edit');
-        Route::patch('/profile', 'update')->name('profile.update');
-        Route::delete('/profile', 'destroy')->name('profile.destroy');
-    });
+        // Perfil y Logout
+        Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-    /*
-    |----------------------------------------------------------------------
-    | 🔐 ROL: ADMINISTRADOR
-    |----------------------------------------------------------------------
-    */
-    Route::middleware('role:Admin')->group(function () {
-        
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-        // --- 🥊 GESTIÓN ACADÉMICA ---
-        Route::resource('alumnos', AlumnoController::class);
-        Route::resource('docentes', DocenteController::class);
-        Route::resource('categorias', CategoriaController::class);
-        Route::resource('periodos', PlantillaPeriodoController::class);
-        Route::resource('inscripciones', InscripcionController::class);
-        Route::resource('cuentas', CuentaInscripcionController::class);
-        
-        // --- 📅 HORARIOS ---
-        Route::resource('horarios', HorarioController::class);
-        Route::controller(HorarioController::class)->group(function () {
-            Route::get('horarios/grupo/{grupo_key}/edit', 'editGroup')->name('horarios.editGroup');
-            Route::put('horarios/grupo/{grupo_key}', 'updateGroup')->name('horarios.updateGroup');
-            Route::delete('horarios/grupo/{grupo_key}', 'destroyGroup')->name('horarios.destroyGroup');
+        // ✅ GESTIÓN DE ASISTENCIA (Admin y Controlador)
+        Route::middleware(['role:attendance_controller|admin'])->group(function () {
+            Route::post('/attendance/scan', [AttendanceController::class, 'scan']);
+            Route::get('/attendance/today', [AttendanceController::class, 'today']); 
+            Route::get('/attendance/history', [AttendanceController::class, 'history']);
         });
 
-        // --- 💰 FINANZAS ---
-        // 1. Crear cuota extra para el alumno (Formulario y Guardado)
-        Route::get('cuotas/crear-para-alumno/{alumno}', [CuotaPagoController::class, 'createForAlumno'])
-            ->name('cuotas.createForAlumno');
+        // ✅ ACADEMIA
+        Route::apiResource('students', StudentController::class);
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('enrollments', EnrollmentController::class);
         
-        // --- LÍNEA AÑADIDA PARA SOLUCIONAR EL ERROR ---
-        Route::post('cuotas/store-for-alumno/{alumno}', [CuotaPagoController::class, 'storeForAlumno'])
-            ->name('cuotas.storeForAlumno');
+        // Acciones especiales de estudiantes
+        Route::post('/students/{student}/create-user', [StudentController::class, 'createUser']);
 
-        // 2. CORRECCIÓN: Registrar pago desde el formulario de Alumnos
-        Route::post('alumnos/{alumno}/registrar-pago', [PagoController::class, 'store'])
-            ->name('alumnos.registrarPago');
-            
-        Route::resource('cuotas', CuotaPagoController::class);
-        Route::resource('tipos_pago', TipoPagoController::class);
-        Route::resource('pagos', PagoController::class);
+        // ✅ TIENDA (Gestión Admin)
+        Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+        
+        // Categorías de productos
+        Route::apiResource('product-categories', ProductCategoryController::class)->only(['store', 'update', 'destroy']);
 
-        // --- 🏪 TIENDA E INVENTARIO ---
-        Route::resource('productos', ProductoController::class); 
-        Route::resource('categorias-productos', CategoriaProductoController::class);
-        Route::resource('ventas', VentaController::class);
-        Route::resource('detalle-ventas', DetalleVentaController::class);
+        // Gestión de Pedidos de Tienda
+        Route::get('/store/orders', [StoreOrderController::class, 'index']);
+        Route::get('/store/orders/{storeOrder}', [StoreOrderController::class, 'show']);
+        Route::put('/store/orders/{storeOrder}', [StoreOrderController::class, 'update']);
 
-        // --- 📰 CONTENIDO Y MARKETING ---
-        Route::resource('noticias', NoticiaController::class);
-        Route::resource('eventos', EventoController::class);
-        Route::resource('peleadores', PeleadorController::class);
-        Route::resource('boletos', BoletoController::class);
+        // ✅ PAGOS Y CRÉDITOS (Enrollments)
+        Route::prefix('enrollments/{enrollment}')->group(function () {
+            Route::post('/credit', [EnrollmentController::class, 'saveCredit']);
+            Route::get('/initial-payment', [EnrollmentController::class, 'getInitialPayment']);
+            Route::post('/initial-payment', [EnrollmentController::class, 'saveInitialPayment']);
+            Route::get('/installments', [EnrollmentController::class, 'installments']);
+        });
+
+        Route::post('/installments/{installment}/pay', [EnrollmentController::class, 'payInstallment']);
     });
-
-    /*
-    |----------------------------------------------------------------------
-    | 💰 ROL: VENTAS
-    |----------------------------------------------------------------------
-    */
-    Route::middleware('role:Ventas')->group(function () {
-        Route::resource('ventas', VentaController::class)->only(['index', 'store', 'show']);
-    });
-
-    /*
-    |----------------------------------------------------------------------
-    | 🎓 ROL: ALUMNO / ESTUDIANTE
-    |----------------------------------------------------------------------
-    */
-    Route::middleware('role:Alumno,Estudiante')->group(function () {
-        Route::get('alumnos/{alumno}/perfil', [AlumnoController::class, 'perfil'])->name('alumnos.perfil');
-        Route::get('alumnos/{alumno}/asistencias', [AsistenciaController::class, 'index'])->name('alumnos.asistencias');
-        Route::get('cuotas/{cuotaPago}/recibo', [CuotaPagoController::class, 'verRecibo'])->name('cuotas.recibo');
-    });
-
-    // --- 📄 DOCUMENTOS Y REPORTES ---
-    Route::get('inscripciones/{alumno}/imprimir-ficha', [InscripcionController::class, 'imprimirFicha'])->name('inscripciones.imprimirFicha');
-    Route::get('pagos/{pago}/recibo-pdf', [PagoController::class, 'imprimirRecibo'])->name('pagos.imprimir_recibo');
-
 });
 
-require __DIR__.'/auth.php';
+// ================= RUTAS DE VISTA (SPA) =================
+// Esta ruta carga el HTML de React para el módulo de escaneo
+Route::middleware(['auth:sanctum', 'role:attendance_controller|admin'])->group(function () {
+    Route::get('/attendance', fn () => view('app')); 
+});
+
+// Fallback para rutas inexistentes
+Route::fallback(fn () => response()->json(['message' => 'Resource not found.'], 404));
