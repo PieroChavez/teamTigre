@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { Layout } from "./components/Layout";
 import LoadingScreen from "./components/LoadingScreen";
+import PublicLayoutWithRegistro from "./layouts/PublicLayoutWithRegistro";
 
 import LoginPage from "./pages/Login";
 import DashboardPage from "./pages/Dashboard";
@@ -18,7 +19,6 @@ import EnrollmentSheetPage from "./pages/Students/EnrollmentSheetPage";
 import StoreCategoriesPage from "./pages/StoreCategoriesPage";
 import StoreOrdersPage from "./pages/StoreOrdersPage";
 
-import PublicLayout from "./layouts/PublicLayout";
 import PublicHome from "./pages/public/Home";
 import PublicAbout from "./pages/public/About";
 import PublicContact from "./pages/public/Contact";
@@ -76,7 +76,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           {/* ======= WEB PÚBLICA ======= */}
-          <Route path="/" element={<PublicLayout />}>
+          <Route path="/" element={<PublicLayoutWithRegistro />}>
             <Route index element={<PublicHome />} />
             <Route path="nosotros" element={<PublicAbout />} />
             <Route path="contacto" element={<PublicContact />} />

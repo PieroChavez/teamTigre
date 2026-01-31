@@ -222,6 +222,16 @@ body.is-public #root{
   background: #000;
 }
 
+/* Video de fondo */
+.public-scope .pub-hero__video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 /* Fondo slider */
 .public-scope .pub-hero__bg{
   position:absolute;
@@ -232,6 +242,7 @@ body.is-public #root{
   filter: saturate(1.05) contrast(1.06);
   opacity: 0;
   transition: opacity 900ms ease;
+  display: none;
 }
 .public-scope .pub-hero__bg.is-active{ opacity: 1; }
 .public-scope .pub-hero__bg.is-kenburns{ animation: pub-kenburns 14s ease-in-out infinite alternate; }

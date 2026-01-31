@@ -59,7 +59,7 @@ export default function PublicAbout() {
         </div>
 
         <Figure
-          src="/about/about-hero.jpg"
+          src="/img/1.jpg"
           alt="Entrenamiento de box"
           className="pub-about-hero__media"
         />
